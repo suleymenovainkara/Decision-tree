@@ -1,0 +1,42 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import LabelEncoder
+
+# Step 1: Load the dataset
+file_path = 'C:/Users/Админ/OneDrive/Documents/3 курс/машинное обучение/Titanic-Dataset.csv'
+df = pd.read_csv(file_path)
+
+# Step 2: Preprocess the data
+# Fill missing values (if any)
+df['Age'].fillna(df['Age'].median(), inplace=True)
+df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
+
+# Drop columns that are not useful for prediction
+df.drop(['Name', 'Ticket', 'Cabin'], axis=1, inplace=True)
+
+# Convert categorical features to numeric using LabelEncoder
+label_enc = LabelEncoder()
+df['Sex'] = label_enc.fit_transform(df['Sex'])
+df['Embarked'] = label_enc.fit_transform(df['Embarked'])
+
+# Define features (X) and target (y)
+X = df.drop('Survived', axis=1)
+y = df['Survived']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 3: Initialize and train the decision tree classifier
+clf = DecisionTreeClassifier(random_state=42)
+clf.fit(X_train, y_train)
+
+# Step 4: Make predictions and evaluate the model
+y_pred = clf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+# Print the results
+print("Accuracy:", accuracy)
+print("Classification Report:\n", classification_report(y_test, y_pred))
